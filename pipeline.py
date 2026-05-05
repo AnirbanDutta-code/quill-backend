@@ -23,7 +23,10 @@ def run_research(query: str, type: str, is_new):
 
     # user query
     if type == "deep_research":
+<<<<<<< HEAD
 
+=======
+>>>>>>> 2f3014e (remove frontend dependecies)
         research_result = websearch(query=query)
 
         state["urls"] = research_result
