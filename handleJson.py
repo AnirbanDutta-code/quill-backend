@@ -2,23 +2,34 @@ import json
 import os
 
 
-async def saveChatfile(body, conv_name):
-    chatFolder = f"chats/{conv_name}/"
-    if not os.path.exists(chatFolder):
-        os.mkdir(chatFolder)
-        print(os.listdir("chats"))
+## <------------ update chats ------------>
+def append_to_chat(convname, new_entry):
 
-    with open(f"{chatFolder}/chat.json", "w", encoding="utf-8") as file:
-        json.dump(body, file)
-    return {"received_data": body}
+    try:
+        chatAddr = f"chats/{convname}"
+        chatFile = f"{chatAddr}/chat.json"
+ 
+        if not os.path.isdir(chatAddr):
+            print("creating")
+            os.makedirs(chatAddr)
+            initial_data = {"chat": [{}]}
+            with open(chatFile, "w") as f:
+                json.dump(initial_data, f, indent=4)
 
+        with open(chatFile, "r") as f:
+            data = json.load(f)
 
-async def handleSaveSourceJson(body, conv_name):
-    chatFolder = f"chats/{conv_name}/"
-    if not os.path.exists(chatFolder):
-        os.mkdir(chatFolder)
-        print(os.listdir("chats"))
+        chat_obj = data["chat"][0]
 
-    with open(f"{chatFolder}/sources.json", "w", encoding="utf-8") as file:
-        json.dump(body, file)
-    return {"received_data": body}
+        next_num = str(max(int(k) for k in chat_obj.keys()) + 1) if chat_obj else "0"
+        chat_obj[next_num] = new_entry
+
+        with open(chatFile, "w") as f:
+            json.dump(data, f, indent=4)
+
+        print("chat updated")
+        return "success"
+
+    except Exception as e:
+        print(f"Error in append_to_chat: {e}")
+        return str(e)

@@ -1,0 +1,17 @@
+{
+    "chat": [
+        {
+            "0": {
+                "human": "hi",
+                "queryType": "ask",
+                "ai": "Hello! \ud83d\ude0a How can I assist you today?",
+                "source": {
+                    "1": {
+                        "urls": "only available on deep reseacrh",
+                        "content": "type is ask , no sources"
+                    }
+                }
+            }
+        }
+    ]
+}
