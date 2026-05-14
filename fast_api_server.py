@@ -4,8 +4,6 @@ from pipeline import run_research
 from handelChatSessions import load_conv
 import os
 from handleJson import append_to_chat
-import asyncio
-import uuid
 
 app = FastAPI()
 
@@ -34,23 +32,28 @@ async def run_search(
     createNewSession: bool,
     convname="",
 ):
-  
-   ## <---------- Return error if parameters make no sense  ------------>  
-   
-    if incognito and createNewSession  :
-        return "cannot create new conversation in incognito , please set to false"
-    
-    
-    if createNewSession and convname=="" :
-        return "convname needed if create new session is true"
 
+    ## <---------- Return error if parameters make no sense  ------------>
+
+    if incognito and createNewSession:
+        return "cannot create new conversation in incognito , please set to false"
+
+    if createNewSession and convname == "":
+        return "convname needed if create new session is true"
 
     ## <---------- run if chat is not incognito ------------>
 
     if not incognito:
         conv_context = await load_conv(conv_name=convname)
+        if conv_context == f"Directory not exists {convname}":
+            return f"no Directory named `{convname}` please create one"
 
-        model_res = run_research(query=query, type=search_type, is_new=createNewSession)
+        model_res = run_research(
+            query=query,
+            type=search_type,
+            is_new=createNewSession,
+            old_chats=conv_context,
+        )
 
         ## <---------- create session if needed ------------>
         if createNewSession:

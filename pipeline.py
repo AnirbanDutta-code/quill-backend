@@ -1,15 +1,23 @@
 from agents import build_srcaping_agent
 from tools import websearch
 from agents import llm_model
-from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
+from handelChatSessions import _build_messages_with_history
+import json
 
 ## <---------- state dictioney for saving all response in one ----------->
 state = {}
 
 
-def run_research(query: str, type: str, is_new: bool,old_chats:str="example"):
-    
+
+
+
+def run_research(query: str, type: str, is_new: bool, old_chats: str = ""):
+
+    ai_message= _build_messages_with_history(query=query, old_chats=old_chats)
+
+    ## <------------ Genarate new converstion from model  -------------->
     if is_new:
+        # For conversation title
         conv_nameByModel = llm_model(
             query=f"Generate a concise title for this conversation.Rules:- 2–6 words,-Title Case,- Main topic only ,- No quotes or extra text Conversation:{query}"
         )
@@ -17,10 +25,6 @@ def run_research(query: str, type: str, is_new: bool,old_chats:str="example"):
 
     ## <------------------------------------ handle deep search query ------------------------------------>
     if type == "deep_research":
-<<<<<<< HEAD
-
-=======
->>>>>>> 2f3014e (remove frontend dependecies)
         research_result = websearch(query=query)
         state["urls"] = research_result
         # Build and run the scraping agent to get content from URLs
@@ -71,7 +75,8 @@ def run_research(query: str, type: str, is_new: bool,old_chats:str="example"):
                 "content": "type is deep thinking  , no sources",
             }
         }
-        smart_reponse = llm_model(query=query, temp=1)
+        # Build messages with chat history
+        smart_reponse = llm_model(query=ai_message, temp=1)
 
         ## <------------ save to state ------------>
         state["sources"] = sources
@@ -86,15 +91,10 @@ def run_research(query: str, type: str, is_new: bool,old_chats:str="example"):
                 "content": "type is ask , no sources",
             }
         }
-        reponse = llm_model(query=query, temp=1)
+        # Build messages with chat history
+        reponse = llm_model(query=ai_message, temp=0)
 
         ## <------------ save to state ------------>
         state["sources"] = sources
         state["reponse"] = reponse.content
-
     return state
-
-
-if __name__ == "__main__":
-    topic = input("\n Enter a research topic : ")
-    run_research(topic)

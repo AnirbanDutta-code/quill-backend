@@ -1,28 +1,16 @@
-{
-    "chat": [
-        {
-            "0": {
-                "human": "hi",
-                "queryType": "ask",
-                "ai": "Hey! \ud83d\ude0a How can I assist you today?",
-                "source": {
-                    "1": {
-                        "urls": "only available on deep reseacrh",
-                        "content": "type is ask , no sources"
-                    }
-                }
-            },
-            "1": {
-                "human": "hi",
-                "queryType": "ask",
-                "ai": "Hello! \ud83d\udc4b How can I help you today?",
-                "source": {
-                    "1": {
-                        "urls": "only available on deep reseacrh",
-                        "content": "type is ask , no sources"
-                    }
-                }
-            }
-        }
-    ]
-}
+[
+  {
+    "role": "previousChatSummerized",
+    "content": "The human introduces themselves as Anirban, a 20-year-old, and the AI greets them warmly, offering assistance. The human asks for their name, and the AI confirms it is Anirban. The human then asks about their age, and the AI responds that their age is 20. The AI continues the conversation from this context. The human asks what the capital of India is, and the AI responds that New Delhi is the capital of India. The human then asks what the capital of LLM is, and the AI explains that LLM stands for large language model, which is essentially text generation. The human asks what deep thinking is, and the AI explains that deep thinking is an LLM mode that specifies the LLM's thinking capacity by setting the temperature."
+  },
+  {
+    "role": "user",
+    "content": "hi",
+    "ask_type": "ask"
+  },
+  {
+    "role": "ai",
+    "content": "hello Anirban ",
+    "source": "nothing"
+  }
+]

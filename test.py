@@ -1,74 +1,94 @@
-import asyncio
-import httpx
-from bs4 import BeautifulSoup
-from urllib.parse import urljoin
-import httpx
-
-
-async def ScrapPhoto(urls: list) -> list:
-    sources = []
-
-    try:
-        async with httpx.AsyncClient() as client:
-            for url in urls:
-                try:
-                    response = await client.get(url, timeout=10)
-                    htmldata = response.text
-                    soup = BeautifulSoup(htmldata, "html.parser")
-
-                    for item in soup.find_all("img"):
-                        if item.get("src") and item["src"].endswith(
-                            (".png", ".jpg", ".jpeg", ".webp")
-                        ):
-                            img = item["src"]
-                            if item["src"].startswith("/"):
-                                img = urljoin(url, item["src"])
-                            sources.append(img)
-
-                except Exception as e:
-                    print(f"Error fetching {url}: {e}")
-
-    except Exception as e:
-        print(f"Error: {e}")
-
-    return sources
-
-
 import json
+import os
+from langchain_classic.memory import ConversationSummaryBufferMemory,ConversationSummaryMemory
+from agents import llm
+from langchain_core.messages import HumanMessage, AIMessage
 
 
-def append_to_chat(filename, new_entry):
+## <------------ update chats ------------>
+def append_to_chat(convname):
+    """
 
-    with open(filename, "r") as f:
-        data = json.load(f)
+    new_entry format:
+    {
+        "human": "user query",
+        "ai": "ai response",
+        "queryType": "ask/deep_research/deep_thinking",
+        "source": {...}
+    }
+    """
+    try:
+        chatAddr = f"chats/{convname}"
+        chatFile = f"{chatAddr}/chat.json"
 
-    chat_obj = data["chat"][0]
+        if not os.path.isdir(chatAddr):
+           print("creating new folder")
+           os.makedirs(chatAddr)
+           initial_data = []
+    with open(chatFile, "w") as f:
+        json.dump(initial_data, f, indent=4)
 
-    next_num = str(max(int(k) for k in chat_obj.keys()) + 1)
-    chat_obj[next_num] = new_entry
+        with open(chatFile, "r") as f:
+            data = json.load(f)
+            
+            print(len(data))
+        
+            print("making buffer memory")
+            # If data length >= 20, use ConversationSummaryBufferMemory to summarize
+        
+        if len(data) > 0 and isinstance(data, list):
+            print("making buffer memory")
+            memory = ConversationSummaryMemory(
+                llm=llm, max_token_limit=100, return_messages=True
+            )
+            # Add existing messages to memory
+            for i in range(0, len(data), 2):
+                if (
+                    i + 1 < len(data)
+                    and data[i].get("role") == "user"
+                    and data[i + 1].get("role") == "ai"
+                ):
+                    memory.save_context(
+                        {"input": data[i]["content"]},
+                        {"output": data[i + 1]["content"]},
+                    )
+            # Get the buffer
+            buffer = memory.
+            # Convert to dict format
+            data = []
+            for msg in buffer:
+                if isinstance(msg, HumanMessage):
+                    data.append(
+                        {"role": "user", "content": msg.content, "ask_type": ""}
+                    )
+                elif isinstance(msg, AIMessage):
+                    data.append({"role": "ai", "content": msg.content, "source": {}})
 
-    with open(filename, "w") as f:
-        json.dump(data, f, indent=4)
+            # Append user message
+        data.append(
+            {
+                "role": "user",
+                "content": new_entry.get("human", ""),
+                "ask_type": new_entry.get("queryType", ""),
+            }
+        )
+             # Append AI message
+        data.append(
+            {
+                "role": "ai",
+                "content": new_entry.get("ai", ""),
+                "source": new_entry.get("source", ""),
+            }
+        )
+        with open(chatFile, "w") as f:
+            json.dump(data, f, indent=4, ensure_ascii=False)
 
+        return "chat updated"
+        print(data)
 
-if __name__ == "__main__":
-    # append_to_chat(
-    #     "chats/chat.json",
-    #     {
-    #         "human": "new question",
-    #         "queryType": "ask",
-    #         "ai": "new answer",
-    #         "source": "[https://new.com]",
-    #     },
-    # )
+    # except Exception as e:
+    #     print(f"Error in append_to_chat: {e}")
+    #     return str(e)
     
-    import uuid
-    id=uuid.uuid3(namespace=uuid.uuid1(),name="anirban")
-    
-    print(id.fields)
-
-
-# 
-    # asyncio.run(
-        # ScrapPhoto(["https://www.imdb.com/title/tt11378946/", "https://comatozze.net/"])
-    # )
+if __name__=="__main__":
+    append_to_chat("Hello",)
