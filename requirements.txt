@@ -1,5 +1,16 @@
-fastapi>=0.95.0
-uvicorn[standard]>=0.22.0
+fastapi
+uvicorn
+langchain
+langchain_classic
+langchain_community
+beautifulsoup4
+langchain
+langchain-mistralai
+python-dotenv
+tavily
+asyncio
+aiofiles
+httpx
 
 # Add other dependencies your project needs below, e.g.:
 # openai
