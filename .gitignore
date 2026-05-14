@@ -24,4 +24,5 @@ _pycache_
 *.njsproj
 *.sln
 *.sw?
-test.py
+test
+
